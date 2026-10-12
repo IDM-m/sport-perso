@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Sport</title>
+<meta name="theme-color" content="#0B0F0E">
+<meta name="description" content="Programme de la semaine, saisie des séances, poids et bilan calorique.">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sport">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Icônes : un seul jeu au trait, réutilisé par <use href="#i-…"> -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3.5 10.5 12 3.5l8.5 7V19a1.5 1.5 0 0 1-1.5 1.5h-4v-6h-6v6H5A1.5 1.5 0 0 1 3.5 19z"/></symbol>
+  <symbol id="i-dumbbell" viewBox="0 0 24 24"><path d="M6.5 7v10M17.5 7v10M3.5 9.5v5M20.5 9.5v5M6.5 12h11"/></symbol>
+  <symbol id="i-scale" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M7.5 10.5a5 5 0 0 1 9 0M12 12l1.8-2.6"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><path d="M8 13.5h.01M12 13.5h.01M16 13.5h.01M8 17h.01M12 17h.01"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><path d="M5.5 12h.01M12 12h.01M18.5 12h.01" stroke-width="3"/></symbol>
+  <symbol id="i-apple" viewBox="0 0 24 24"><path d="M12 8c-1.6-1.4-5.3-1.7-6.6 1.3-1.2 2.9-.2 7.2 2.3 9.6 1.4 1.3 2.5 1.1 4.3.5 1.8.6 2.9.8 4.3-.5 2.5-2.4 3.5-6.7 2.3-9.6C17.3 6.3 13.6 6.6 12 8z"/><path d="M12 8c0-2.2 1-3.8 3-4.6"/></symbol>
+  <symbol id="i-trend" viewBox="0 0 24 24"><path d="M3.5 17 9 11.5l4 4 7.5-7.5"/><path d="M15 8h5.5v5.5"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1.3-3.6 4.2-5.5 7.5-5.5s6.2 1.9 7.5 5.5"/></symbol>
+  <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3.5v8"/><path d="M6.6 6.6a7.5 7.5 0 1 0 10.8 0"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2.5 4.5 13.5H11l-1 8 8.5-11H12z"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5.5 6.5 6.5L9 18.5"/></symbol>
+  <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M7.5 4h9v5a4.5 4.5 0 0 1-9 0z"/><path d="M7.5 6H4.5v1.5A3 3 0 0 0 7.6 10.5M16.5 6h3v1.5a3 3 0 0 1-3.1 3M12 13.5V17M8.5 20.5h7M9.5 17h5v3.5h-5z"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 21c-3.6 0-6-2.4-6-5.8 0-3.6 3-5.6 3.6-9.2 2.3 1.2 3.4 3 3.6 4.6.9-.6 1.5-1.6 1.6-2.8 2 1.6 3.2 4.3 3.2 7.1 0 3.6-2.4 6.1-6 6.1z"/></symbol>
+  <symbol id="i-plate" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/></symbol>
+  <symbol id="i-steps" viewBox="0 0 24 24"><path d="M7 3.5c1.7 0 2.7 1.8 2.7 4.5S8.8 13 7.3 13 4.5 10.9 4.5 8.4 5.4 3.5 7 3.5zM5 16.5l4.2-.7.4 2.4a2.1 2.1 0 0 1-4.2.7zM17 7c1.6 0 2.5 2.5 2.5 5s-1.2 4.4-2.6 4.4-2.7-2-2.7-4.5S15.4 7 17 7zM19.1 19.6l-4.2-.7-.4 2.3a2.1 2.1 0 0 0 4.2.8z"/></symbol>
+  <symbol id="i-install" viewBox="0 0 24 24"><path d="M12 3.5v11M7.5 10l4.5 4.5 4.5-4.5"/><path d="M4.5 16v2.5a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V16"/></symbol>
+  <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3.5c3.2 3.8 6 7.2 6 10.6a6 6 0 0 1-12 0c0-3.4 2.8-6.8 6-10.6z"/></symbol>
+</svg>
+
+<!-- ===================== ÉCRAN DE CONNEXION ===================== -->
+<div id="auth-screen" class="auth-screen">
+  <div class="auth-card">
+    <div class="auth-brand"><span class="accent">Sport</span></div>
+    <p class="auth-sub">Ton programme, tes chiffres, ta cadence.</p>
+
+    <form id="auth-form" class="auth-form">
+      <label class="field">
+        <span>Identifiant</span>
+        <input type="text" id="auth-id" required autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="30" aria-describedby="auth-error">
+      </label>
+      <label class="field">
+        <span>Mot de passe</span>
+        <div class="password-field">
+          <input type="password" id="auth-password" required autocomplete="current-password" minlength="6" aria-describedby="auth-error">
+          <button type="button" id="auth-password-toggle" class="password-toggle" aria-label="Afficher le mot de passe" aria-pressed="false">👁</button>
+        </div>
+      </label>
+      <p id="auth-error" class="auth-error" role="alert" hidden></p>
+      <button type="submit" id="auth-submit" class="btn btn-primary btn-block">Se connecter</button>
+    </form>
+
+    <div class="auth-divider"><span>ou</span></div>
+    <button id="auth-demo" type="button" class="btn btn-demo btn-block">Essayer la démo, sans compte</button>
+    <button id="auth-install" type="button" class="link-btn" hidden>Installer l'application sur cet appareil</button>
+    <p class="auth-hint auth-demo-note">10 semaines de séances, pesées et repas fictifs, directement dans ton navigateur. Aucune inscription, rien n'est enregistré.</p>
+  </div>
+</div>
+
+<!-- ===================== APPLICATION ===================== -->
+<div id="app" class="app" hidden>
+
+  <header class="topbar">
+    <div class="topbar-brand">
+      <span class="topbar-num" id="hdr-poids-actuel">—</span>
+      <span class="topbar-sep">/</span>
+      <span class="topbar-num accent" id="hdr-poids-objectif">—</span>
+      <span class="topbar-unit">kg</span>
+    </div>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="Sections de l'application">
+      <button class="tab-btn is-active" id="tab-dashboard" data-tab="dashboard" role="tab" aria-selected="true" aria-controls="view-dashboard"><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg>Dashboard</button>
+      <button class="tab-btn" id="tab-seance" data-tab="seance" role="tab" aria-selected="false" aria-controls="view-seance"><svg class="ico" aria-hidden="true"><use href="#i-dumbbell"/></svg>Séance</button>
+      <button class="tab-btn" id="tab-poids" data-tab="poids" role="tab" aria-selected="false" aria-controls="view-poids"><svg class="ico" aria-hidden="true"><use href="#i-scale"/></svg>Poids</button>
+      <button class="tab-btn" id="tab-nutrition" data-tab="nutrition" role="tab" aria-selected="false" aria-controls="view-nutrition"><svg class="ico" aria-hidden="true"><use href="#i-apple"/></svg>Nutrition</button>
+      <button class="tab-btn" id="tab-historique" data-tab="historique" role="tab" aria-selected="false" aria-controls="view-historique"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg>Historique</button>
+      <button class="tab-btn" id="tab-force" data-tab="force" role="tab" aria-selected="false" aria-controls="view-force"><svg class="ico" aria-hidden="true"><use href="#i-trend"/></svg>Force</button>
+      <button class="tab-btn" id="tab-profil" data-tab="profil" role="tab" aria-selected="false" aria-controls="view-profil"><svg class="ico" aria-hidden="true"><use href="#i-user"/></svg>Profil</button>
+    </nav>
+    <button id="install-btn" class="icon-btn install-btn" type="button" title="Installer l'application" aria-label="Installer l'application" hidden><svg class="ico" aria-hidden="true"><use href="#i-install"/></svg><span>Installer</span></button>
+    <button id="logout-btn" class="icon-btn" title="Se déconnecter" aria-label="Se déconnecter"><svg class="ico" aria-hidden="true"><use href="#i-power"/></svg></button>
+  </header>
+
+  <div id="demo-banner" class="demo-banner" hidden>
+    <span><b>Démo</b> · données fictives. Tout est modifiable, rien n'est enregistré : recharger la page repart de zéro.</span>
+    <button type="button" id="demo-exit" class="demo-exit">Quitter la démo</button>
+  </div>
+
+  <main class="views">
+
+    <!-- ---------- DASHBOARD ---------- -->
+    <section id="view-dashboard" class="view is-active" role="tabpanel" aria-labelledby="tab-dashboard" tabindex="0">
+
+      <!-- Affiché tant que le profil ne permet pas les calculs (nouveau compte) -->
+      <div class="card profil-hint" id="profil-hint" hidden>
+        <h3 class="card-label">Bienvenue</h3>
+        <p class="card-head-sub">Renseigne ton âge, ta taille et ton poids objectif pour activer le calcul des calories, le trajet et la projection.</p>
+        <button type="button" id="profil-hint-btn" class="btn btn-primary btn-block">Compléter mon profil</button>
+      </div>
+
+      <!-- AUJOURD'HUI : le déficit en grand, les 3 chiffres qui le font, la séance prévue -->
+      <div class="card hero-card">
+        <p class="card-eyebrow" id="hero-date">Aujourd'hui</p>
+        <div class="hero-main">
+          <div class="hero-ring" id="hero-ring">
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="ring-bg" cx="60" cy="60" r="52"/>
+              <circle class="ring-fg" id="deficit-ring" cx="60" cy="60" r="52" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"/>
+            </svg>
+            <div class="hero-ring-center">
+              <b id="gauge-value">—</b>
+              <span id="hero-ring-label">kcal de déficit</span>
+              <small>objectif <span id="deficit-objectif-label">500</span></small>
+            </div>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat"><span class="hs-ico is-brule"><svg class="ico" aria-hidden="true"><use href="#i-flame"/></svg></span><span class="hs-txt"><small>Brûlé</small><b id="hero-brule">—</b></span></div>
+            <div class="hero-stat"><span class="hs-ico is-mange"><svg class="ico" aria-hidden="true"><use href="#i-plate"/></svg></span><span class="hs-txt"><small>Mangé</small><b id="hero-mange">—</b></span></div>
+            <div class="hero-stat"><span class="hs-ico is-pas"><svg class="ico" aria-hidden="true"><use href="#i-steps"/></svg></span><span class="hs-txt"><small>Pas</small><b id="hero-pas">—</b></span></div>
+          </div>
+        </div>
+        <p class="hero-note" id="deficit-note"></p>
+        <button type="button" class="hero-seance" id="hero-seance" hidden>
+          <span class="hero-seance-ico"><svg class="ico" aria-hidden="true"><use href="#i-dumbbell"/></svg></span>
+          <span class="hero-seance-txt"><small id="hero-seance-label">Séance du jour</small><b id="hero-seance-nom"></b><span class="hero-seance-meta" id="hero-seance-meta"></span></span>
+          <svg class="ico hero-seance-chev" aria-hidden="true"><use href="#i-chevron"/></svg>
+        </button>
+      </div>
+
+      <div class="journey-card">
+        <div class="journey-head">
+          <span class="journey-label">Le trajet</span>
+          <span class="journey-pct" id="journey-pct">0%</span>
+        </div>
+        <div class="journey-track">
+          <div class="journey-fill" id="journey-fill"></div>
+          <div class="journey-marker" id="journey-marker">
+            <span class="journey-marker-value" id="journey-marker-value">—</span>
+          </div>
+        </div>
+        <div class="journey-ends">
+          <span><span id="journey-depart-label">— kg</span> <i>départ</i></span>
+          <span><span id="journey-objectif-label">— kg</span> <i>objectif</i></span>
+        </div>
+      </div>
+
+      <div class="card calories-card">
+        <div class="card-head">
+          <h3 class="card-label">Détail des calories</h3>
+          <span class="card-head-sub">Métabolisme, marche et sport, face au consommé</span>
+        </div>
+
+        <div class="cal-bar-block">
+          <div class="cal-bar-head">
+            <span>Brûlé</span>
+            <b id="brule-total-value">0 kcal</b>
+          </div>
+          <div class="cal-bar-track">
+            <div class="cal-bar-seg cal-seg-meta" id="brule-meta-seg"></div>
+            <div class="cal-bar-seg cal-seg-marche" id="brule-marche-seg"></div>
+            <div class="cal-bar-seg cal-seg-sport" id="brule-sport-seg"></div>
+          </div>
+          <div class="cal-bar-legend">
+            <span class="legend-item"><span class="dot dot-meta"></span>Métabolisme <b id="leg-meta">0</b></span>
+            <span class="legend-item"><span class="dot dot-marche"></span>Marche <b id="leg-marche">0</b></span>
+            <span class="legend-item"><span class="dot dot-sport"></span>Sport (muscu + cardio) <b id="leg-sport">0</b></span>
+          </div>
+          <p class="cal-bar-note" id="brule-note"></p>
+        </div>
+
+        <div class="cal-bar-block">
+          <div class="cal-bar-head">
+            <span>Consommé</span>
+            <b><span id="consomme-value">0</span> / <span id="budget-value">0</span> kcal</b>
+          </div>
+          <div class="cal-bar-track">
+            <div class="cal-bar-seg cal-seg-consomme" id="consomme-seg"></div>
+          </div>
+          <p class="cal-bar-note" id="budget-note"></p>
+        </div>
+
+      </div>
+
+      <div class="card bilan7-card">
+        <div class="card-head">
+          <h3 class="card-label">7 derniers jours</h3>
+          <span class="card-head-sub">Seuls les jours où le consommé est connu comptent</span>
+        </div>
+        <p class="eta-big" id="bilan7-moyenne">—</p>
+        <p class="eta-sub" id="bilan7-sub"></p>
+        <ul class="bilan7-list" id="bilan7-list"></ul>
+      </div>
+
+      <div class="card hydra-card">
+        <div class="card-head">
+          <h3 class="card-label">Hydratation</h3>
+          <span class="card-head-sub">Objectif ajusté à ton activité du jour</span>
+        </div>
+        <div class="cal-bar-block">
+          <div class="cal-bar-head">
+            <span>Bu aujourd'hui</span>
+            <b><span id="hydra-value">0</span> / <span id="hydra-objectif">0</span> L</b>
+          </div>
+          <div class="cal-bar-track">
+            <div class="cal-bar-seg cal-seg-eau" id="hydra-seg"></div>
+          </div>
+          <p class="cal-bar-note" id="hydra-note"></p>
+        </div>
+      </div>
+
+      <div class="grid-top">
+        <div class="card streak-card">
+          <h3 class="card-label">Séances cette semaine</h3>
+          <div class="streak-dots" id="streak-dots"></div>
+          <p class="streak-count"><span id="streak-fait">0</span> / <span id="streak-objectif">6</span> faites<span class="streak-vol" id="streak-volume"></span></p>
+          <p class="streak-sub" id="streak-message">Continue comme ça.</p>
+        </div>
+
+        <div class="card eta-card">
+          <h3 class="card-label">Arrivée estimée</h3>
+          <p class="eta-big" id="eta-value">—</p>
+          <p class="eta-sub" id="eta-sub">Pas encore assez de données</p>
+        </div>
+      </div>
+
+      <div class="card weight-chart-card">
+        <div class="card-head">
+          <h3 class="card-label">Évolution du poids</h3>
+          <span class="card-head-sub" id="chart-head-range"></span>
+        </div>
+        <canvas id="chart-poids" height="140"></canvas>
+        <p class="chart-projection-note" id="projection-note"></p>
+      </div>
+
+      <div class="card">
+        <h3 class="card-label">Derniers records</h3>
+        <ul id="pr-list" class="pr-list">
+          <li class="empty-row">Aucun record pour l'instant.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ---------- SÉANCE ---------- -->
+    <section id="view-seance" class="view" role="tabpanel" aria-labelledby="tab-seance" tabindex="0">
+      <!-- SÉANCE DU JOUR (programme de la semaine, s'il y en a un) -->
+      <div id="programme-jour" class="card programme-jour" hidden>
+        <p id="programme-label" class="card-eyebrow">Aujourd'hui</p>
+        <div id="programme-semaine" class="programme-semaine" aria-label="Programme de la semaine"></div>
+        <div class="programme-titre">
+          <b id="programme-nom"></b>
+          <span id="programme-orientation" class="programme-tag"></span>
+          <span id="programme-fait-muscu" class="programme-fait">✓ Faite</span>
+        </div>
+        <p id="programme-meta" class="programme-meta"></p>
+        <ol id="programme-exos" class="programme-exos"></ol>
+        <div id="programme-cardio" class="programme-cardio"></div>
+        <div class="programme-actions">
+          <button id="programme-load-muscu" class="btn btn-primary" type="button">Charger la muscu</button>
+          <button id="programme-load-cardio" class="btn btn-ghost" type="button">Charger le cardio</button>
+        </div>
+      </div>
+
+      <div class="card" id="seance-form-card">
+        <h3 class="card-label">Nouvelle séance</h3>
+        <div class="seance-type-toggle">
+          <button class="toggle-btn is-active" data-type="cardio">Cardio</button>
+          <button class="toggle-btn" data-type="circuit">Circuit</button>
+          <button class="toggle-btn" data-type="muscu">Musculation</button>
+        </div>
+
+        <!-- NOUVEL EXERCICE (partagé entre les 3 formulaires) -->
+        <div id="new-exercice-form" class="new-exercice-form" hidden>
+          <h4 class="new-exercice-title">Nouvel exercice</h4>
+          <label class="field">
+            <span>Nom</span>
+            <input type="text" id="new-exo-nom" placeholder="ex: Développé couché" enterkeyhint="done">
+          </label>
+          <label class="field">
+            <span>Type</span>
+            <select id="new-exo-type">
+              <option value="muscu">Musculation</option>
+              <option value="cardio">Cardio</option>
+              <option value="mixte">Mixte / Full body</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Groupe musculaire</span>
+            <select id="new-exo-groupe">
+              <option value="pecs">Pecs</option>
+              <option value="dos">Dos</option>
+              <option value="epaules">Épaules</option>
+              <option value="biceps">Biceps</option>
+              <option value="triceps">Triceps</option>
+              <option value="avant_bras">Avant-bras</option>
+              <option value="jambes">Jambes</option>
+              <option value="fessiers">Fessiers</option>
+              <option value="abdos">Abdos</option>
+              <option value="full_body">Full body</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Intensité (MET) — 3 léger, 5 modéré, 8+ intense</span>
+            <input type="number" id="new-exo-met" step="0.5" min="1" value="5">
+          </label>
+          <div class="new-exercice-actions">
+            <button id="new-exo-cancel" class="btn btn-ghost" type="button">Annuler</button>
+            <button id="new-exo-save" class="btn btn-primary" type="button">Ajouter l'exercice</button>
+          </div>
+        </div>
+
+        <!-- CARDIO FORM -->
+        <div id="form-cardio" class="seance-form">
+          <label class="field">
+            <span>Exercice</span>
+            <select id="cardio-exercice"></select>
+          </label>
+          <label class="field">
+            <span>Durée (minutes)</span>
+            <input type="number" id="cardio-duree" min="1" step="1" placeholder="ex: 30" inputmode="numeric" enterkeyhint="done">
+          </label>
+          <div class="calc-preview">
+            <span>Calories estimées</span>
+            <b id="cardio-calc" aria-live="polite">0 kcal</b>
+          </div>
+          <button id="cardio-save" class="btn btn-primary btn-block">Enregistrer la séance</button>
+        </div>
+
+        <!-- CIRCUIT FORM -->
+        <div id="form-circuit" class="seance-form" hidden>
+          <p class="card-head-sub">Enchaîne plusieurs exercices sur plusieurs tours (ex: burpees → pompes → planche).</p>
+          <div id="circuit-blocks" class="exo-blocks"></div>
+          <select id="circuit-add-exercice-select" class="add-exo-select" aria-label="Ajouter un exercice au circuit"></select>
+          <label class="field">
+            <span>Tours (rounds)</span>
+            <input type="number" id="circuit-rounds" min="1" step="1" value="3" inputmode="numeric">
+          </label>
+          <div class="circuit-rest-row">
+            <label class="field"><span>Repos entre exos (s)</span><input type="number" id="circuit-repos-exo" min="0" step="5" value="15" inputmode="numeric"></label>
+            <label class="field"><span>Repos entre tours (s)</span><input type="number" id="circuit-repos-tour" min="0" step="5" value="60" inputmode="numeric"></label>
+          </div>
+          <div class="calc-preview">
+            <span>Calories estimées (circuit)</span>
+            <b id="circuit-calc" aria-live="polite">0 kcal</b>
+          </div>
+          <button id="circuit-save" class="btn btn-primary btn-block">Enregistrer la séance</button>
+        </div>
+
+        <!-- MUSCU FORM -->
+        <div id="form-muscu" class="seance-form" hidden>
+          <div id="muscu-reprises" class="reprises" hidden>
+            <span class="reprises-label">Reprendre une séance</span>
+            <div id="muscu-reprises-chips" class="reprises-chips"></div>
+          </div>
+          <div class="template-row">
+            <select id="muscu-template-select" aria-label="Charger un modèle de séance"><option value="">Charger un modèle…</option></select>
+            <button id="muscu-template-delete" class="icon-btn" type="button" title="Supprimer le modèle sélectionné" aria-label="Supprimer le modèle sélectionné">🗑</button>
+          </div>
+          <div id="muscu-series-list" class="exo-blocks"></div>
+          <select id="muscu-add-exercice-select" class="add-exo-select" aria-label="Ajouter un exercice à la séance"></select>
+          <button id="muscu-clear" class="link-btn muscu-clear" type="button" hidden>Vider la séance</button>
+          <div class="calc-preview">
+            <span>Séance estimée</span>
+            <b id="muscu-calc" aria-live="polite">0 kcal</b>
+          </div>
+          <button id="muscu-template-save" class="btn btn-ghost btn-block" type="button">Enregistrer comme modèle</button>
+          <button id="muscu-save" class="btn btn-primary btn-block">Enregistrer la séance</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-label">Séances du jour</h3>
+        <ul id="seances-jour" class="seance-list">
+          <li class="empty-row">Aucune séance aujourd'hui.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ---------- POIDS ---------- -->
+    <section id="view-poids" class="view" role="tabpanel" aria-labelledby="tab-poids" tabindex="0">
+      <div class="card">
+        <h3 class="card-label">Ajouter une pesée</h3>
+        <div class="inline-form">
+          <input type="text" id="poids-input" placeholder="ex: 111,4" inputmode="decimal" enterkeyhint="done" autocomplete="off">
+          <span class="unit-suffix">kg</span>
+          <button id="poids-save" class="btn btn-primary">Ajouter</button>
+        </div>
+        <p class="cal-bar-note poids-stats" id="poids-stats"></p>
+      </div>
+      <div class="card">
+        <h3 class="card-label">Historique des pesées</h3>
+        <ul id="poids-list" class="data-list"></ul>
+      </div>
+    </section>
+
+    <!-- ---------- NUTRITION ---------- -->
+    <section id="view-nutrition" class="view" role="tabpanel" aria-labelledby="tab-nutrition" tabindex="0">
+      <div class="card">
+        <h3 class="card-label">Aujourd'hui</h3>
+        <div id="nutrition-today"></div>
+        <div class="hydra-block">
+          <div class="cal-bar-head">
+            <span>Protéines</span>
+            <b><span id="prot-value">0</span> / <span id="prot-objectif">0</span> g</b>
+          </div>
+          <div class="cal-bar-track">
+            <div class="cal-bar-seg cal-seg-prot" id="prot-seg"></div>
+          </div>
+          <p class="cal-bar-note" id="prot-note"></p>
+        </div>
+        <div class="hydra-block">
+          <div class="cal-bar-head">
+            <span>Hydratation</span>
+            <b><span id="nutri-hydra-value">0</span> / <span id="nutri-hydra-objectif">0</span> L</b>
+          </div>
+          <div class="cal-bar-track">
+            <div class="cal-bar-seg cal-seg-eau" id="nutri-hydra-seg"></div>
+          </div>
+          <p class="cal-bar-note" id="nutri-hydra-note"></p>
+          <p class="cal-bar-note hydra-detail" id="nutri-hydra-detail"></p>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="card-label">Saisie / correction manuelle</h3>
+        <p class="card-head-sub">Se remplit automatiquement chaque soir via le raccourci iOS (voir Profil). Sans raccourci, ou pour corriger, saisis tes valeurs ici : seuls les champs remplis sont enregistrés, un champ vide ne touche à rien.</p>
+        <div class="inline-form-stack">
+          <div class="inline-form">
+            <input type="number" id="nutrition-calories" step="1" placeholder="Calories">
+            <span class="unit-suffix">kcal</span>
+          </div>
+          <div class="inline-form">
+            <input type="number" id="nutrition-proteines" step="1" placeholder="Protéines (optionnel)">
+            <span class="unit-suffix">g</span>
+          </div>
+          <div class="inline-form">
+            <input type="number" id="nutrition-eau" step="0.1" placeholder="Eau (optionnel)">
+            <span class="unit-suffix">L</span>
+          </div>
+          <button id="nutrition-save" class="btn btn-primary btn-block">Enregistrer</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- HISTORIQUE ---------- -->
+    <section id="view-historique" class="view" role="tabpanel" aria-labelledby="tab-historique" tabindex="0">
+      <div class="card">
+        <div class="card-head">
+          <h3 class="card-label">Régularité</h3>
+          <span class="card-head-sub">Les 12 dernières semaines, une case par jour</span>
+        </div>
+        <div id="heatmap" class="heatmap"></div>
+        <div class="heatmap-legend">
+          <span>Moins</span>
+          <span class="dot hm-0"></span>
+          <span class="dot hm-1"></span>
+          <span class="dot hm-2"></span>
+          <span class="dot hm-3"></span>
+          <span>Plus</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-label">Séances passées</h3>
+        <ul id="histo-seances" class="seance-list histo-list">
+          <li class="empty-row">Aucune séance enregistrée.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ---------- FORCE ---------- -->
+    <section id="view-force" class="view" role="tabpanel" aria-labelledby="tab-force" tabindex="0">
+      <div class="card">
+        <h3 class="card-label">Progression de force</h3>
+        <label class="field">
+          <span>Exercice</span>
+          <select id="force-exercice"></select>
+        </label>
+        <button id="force-suivi" class="suivi-toggle" type="button" aria-pressed="false">
+          <span class="suivi-star">☆</span><span id="force-suivi-label">Suivre les records</span>
+        </button>
+        <canvas id="chart-force" height="100"></canvas>
+        <p class="cal-bar-note">Charge max et 1RM estimé (Epley) sur l'axe de gauche, tonnage de la séance sur l'axe de droite.</p>
+      </div>
+    </section>
+
+    <!-- ---------- PROFIL ---------- -->
+    <section id="view-profil" class="view" role="tabpanel" aria-labelledby="tab-profil" tabindex="0">
+      <div class="card">
+        <h3 class="card-label">Ton profil</h3>
+        <p class="card-head-sub">Sert à calculer ton métabolisme de base (BMR) pour le déficit calorique.</p>
+        <label class="field">
+          <span>Âge</span>
+          <input type="number" id="profil-age" min="10" max="100">
+        </label>
+        <label class="field">
+          <span>Taille (cm)</span>
+          <input type="number" id="profil-taille" min="100" max="230">
+        </label>
+        <label class="field">
+          <span>Sexe</span>
+          <select id="profil-sexe">
+            <option value="homme">Homme</option>
+            <option value="femme">Femme</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Poids de départ (kg)</span>
+          <input type="text" id="profil-depart" inputmode="decimal" placeholder="Par défaut : ta première pesée">
+        </label>
+        <label class="field">
+          <span>Poids objectif (kg)</span>
+          <input type="text" id="profil-objectif" inputmode="decimal" placeholder="ex : 75">
+        </label>
+        <label class="field">
+          <span>Objectif de déficit quotidien (kcal)</span>
+          <input type="number" id="profil-deficit" step="50" min="0" max="1000" value="500">
+        </label>
+        <p class="card-head-sub field-note">Entre 300 et 750 kcal/j est soutenable. Plafonné à 1000 : au-delà, le budget tomberait sous ton métabolisme de base et l'objectif deviendrait inatteignable.</p>
+        <label class="field">
+          <span>Séances par semaine</span>
+          <input type="number" id="profil-seances" step="1" min="1" max="7" value="4">
+        </label>
+        <label class="field">
+          <span>Niveau d'activité hors sport (secours)</span>
+          <select id="profil-activite">
+            <option value="1.2">Sédentaire (bureau, peu de marche)</option>
+            <option value="1.375">Légèrement actif</option>
+            <option value="1.55">Actif</option>
+          </select>
+        </label>
+        <p class="card-head-sub field-note">Utilisé seulement les jours où aucune donnée de marche n'a été reçue automatiquement (voir la synchronisation ci-dessous).</p>
+        <button id="profil-save" class="btn btn-primary btn-block">Enregistrer</button>
+        <p id="profil-saved" class="save-confirm" hidden>Profil enregistré.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3 class="card-label">Mot de passe</h3>
+          <span class="card-head-sub">Aucun email n'est relié au compte : il ne peut pas être réinitialisé, garde-le bien.</span>
+        </div>
+        <div class="inline-form-stack">
+          <label class="field">
+            <span>Nouveau mot de passe</span>
+            <input type="password" id="mdp-nouveau" autocomplete="new-password" minlength="6">
+          </label>
+          <label class="field">
+            <span>Confirmer</span>
+            <input type="password" id="mdp-confirmation" autocomplete="new-password" minlength="6">
+          </label>
+          <button id="mdp-save" class="btn btn-ghost btn-block" type="button">Changer le mot de passe</button>
+        </div>
+        <p id="mdp-result" class="save-confirm" hidden></p>
+      </div>
+
+      <div class="card">
+        <h3 class="card-label">Synchronisation (raccourcis iOS)</h3>
+        <p class="card-head-sub">Cette clé identifie ton compte pour le raccourci iOS, qui envoie les données d'Apple Santé : pas, énergie active, et ce que ton app de nutrition y enregistre (calories, protéines, eau). Ne la partage pas.</p>
+        <div class="api-key-box" id="profil-api-key">—</div>
+      </div>
+
+      <details class="card card-details">
+        <summary>
+          <span class="card-head">
+            <span class="card-label">Raccourci « Sync du jour »</span>
+            <span class="card-head-sub">Le pas-à-pas, à suivre une seule fois dans l'app Raccourcis</span>
+          </span>
+          <svg class="ico details-chev" aria-hidden="true"><use href="#i-chevron"/></svg>
+        </summary>
+        <p class="card-head-sub">Un seul raccourci envoie chaque soir tes pas et ton énergie active <b>et</b> tes calories, protéines et eau, tous lus dans Apple Santé.</p>
+
+        <p class="cal-bar-note">Prérequis : dans ton app de nutrition (Yazio, MyFitnessPal, Lifesum…), autoriser l'écriture vers <b>Apple Santé</b> de <b>Énergie alimentaire</b>, <b>Protéines</b> et <b>Eau</b>. Le raccourci lit l'app Santé, jamais l'app de nutrition directement : n'importe laquelle convient.</p>
+
+        <ol class="shortcut-steps">
+          <li>Raccourcis → onglet <b>Automatisation</b> → <b>+</b> → <b>Heure de la journée</b> → en fin de soirée (ex. <b>23:30</b>), tous les jours, <b>Exécuter immédiatement</b> (sans confirmation).</li>
+          <li>Pour chacune des 5 mesures ci-dessous, enchaîner le même trio d'actions :
+            <ul class="shortcut-body-list">
+              <li><b>Rechercher les échantillons de santé</b> — le Type voulu, plus un filtre <b>Date de début · aujourd'hui</b>, <b>Limite</b> désactivée</li>
+              <li><b>Calculer les statistiques</b> — opération <b>Somme</b></li>
+              <li><b>Définir la variable</b> — le nom indiqué dans le tableau</li>
+            </ul>
+          </li>
+          <li><b>Obtenir le contenu de l'URL</b>, réglée avec les valeurs plus bas.</li>
+        </ol>
+
+        <div class="shortcut-field">
+          <span class="shortcut-label">Les 5 mesures à lire dans <b>Santé</b></span>
+          <ul class="shortcut-body-list">
+            <li><b>Pas</b> <i>(Activité)</i> → variable <code>Pas</code></li>
+            <li><b>Énergie active</b> <i>(Activité)</i> → variable <code>CalMarche</code></li>
+            <li><b>Énergie alimentaire</b> <i>(Nutrition)</i> → variable <code>Calories</code></li>
+            <li><b>Protéines</b> <i>(Nutrition)</i> → variable <code>Proteines</code></li>
+            <li><b>Eau</b> <i>(Nutrition)</i> → variable <code>Eau</code></li>
+          </ul>
+          <p class="cal-bar-note">Ne pas confondre <b>Énergie active</b> (dépensée en bougeant) avec <b>Énergie alimentaire</b> (mangée) ni avec <b>Énergie au repos</b>. L'énergie active couvre toute la journée, séances comprises : l'app sépare elle-même la marche (d'après les pas) du reste, et ne rajoute jamais une séance déjà mesurée par Santé. Sur certaines versions d'iOS, la somme se règle directement dans l'action de recherche, sous <b>Calculer</b> : dans ce cas l'action « Calculer les statistiques » est inutile.</p>
+        </div>
+
+        <div class="shortcut-field">
+          <span class="shortcut-label">URL — méthode <b>POST</b></span>
+          <div class="copy-row"><code id="sc-url">—</code><button class="btn-copy" type="button" data-copy="sc-url">Copier</button></div>
+        </div>
+
+        <div class="shortcut-field">
+          <span class="shortcut-label">Un seul en-tête à ajouter — <code>apikey</code></span>
+          <div class="copy-row"><code id="sc-anon">—</code><button class="btn-copy" type="button" data-copy="sc-anon">Copier</button></div>
+          <p class="cal-bar-note">Le <code>Content-Type</code> est ajouté tout seul par Raccourcis dès que le corps est en JSON. En cas d'erreur 401, ajouter un second en-tête <code>Authorization</code> valant <code>Bearer</code> suivi de la même clé.</p>
+        </div>
+
+        <div class="shortcut-field">
+          <span class="shortcut-label">Corps de la requête — <b>JSON</b>, 6 champs</span>
+          <ul class="shortcut-body-list">
+            <li><code>p_api_key</code> — Texte — <span class="sc-inline" id="sc-key">—</span> <button class="btn-copy" type="button" data-copy="sc-key">Copier</button></li>
+            <li><code>p_pas</code> — Nombre — variable <b>Pas</b></li>
+            <li><code>p_calories_marche</code> — Nombre — variable <b>CalMarche</b></li>
+            <li><code>p_calories</code> — Nombre — variable <b>Calories</b></li>
+            <li><code>p_proteines</code> — Nombre — variable <b>Proteines</b></li>
+            <li><code>p_eau_litres</code> — Nombre — variable <b>Eau</b></li>
+          </ul>
+          <p class="cal-bar-note">Pas besoin d'envoyer la date : le serveur prend la journée en cours (heure de Paris). Un champ vide ou à <b>0</b> (journée sans saisie dans l'app de nutrition) n'écrase jamais une valeur déjà enregistrée et ne compte pas comme un jour à 0 kcal. L'eau est acceptée en litres comme en millilitres.</p>
+        </div>
+
+        <button id="sc-test" class="btn btn-ghost btn-block" type="button">Tester la connexion (n'écrase aucune donnée)</button>
+        <p id="sc-test-result" class="save-confirm" hidden></p>
+      </details>
+    </section>
+
+  </main>
+
+  <button id="fab-seance" class="fab" title="Nouvelle séance" aria-label="Aller à Nouvelle séance" hidden><svg class="ico" aria-hidden="true"><use href="#i-bolt"/></svg></button>
+
+  <!-- Navigation mobile : 4 onglets principaux + « Plus » (les 7 onglets ne tiennent pas en largeur) -->
+  <nav class="bottom-nav" id="bottom-nav" aria-label="Navigation principale (mobile)">
+    <button type="button" class="bn-btn is-active" data-tab="dashboard"><span class="bn-ico"><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg></span>Dashboard</button>
+    <button type="button" class="bn-btn" data-tab="seance"><span class="bn-ico"><svg class="ico" aria-hidden="true"><use href="#i-dumbbell"/></svg></span>Séance</button>
+    <button type="button" class="bn-btn" data-tab="poids"><span class="bn-ico"><svg class="ico" aria-hidden="true"><use href="#i-scale"/></svg></span>Poids</button>
+    <button type="button" class="bn-btn" data-tab="historique"><span class="bn-ico"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg></span>Historique</button>
+    <button type="button" class="bn-btn" id="bn-more" aria-expanded="false" aria-controls="more-sheet"><span class="bn-ico"><svg class="ico" aria-hidden="true"><use href="#i-more"/></svg></span>Plus</button>
+  </nav>
+  <div class="more-sheet" id="more-sheet" hidden>
+    <button type="button" class="ms-btn" data-tab="nutrition"><span class="bn-ico"><svg class="ico" aria-hidden="true"><use href="#i-apple"/></svg></span>Nutrition</button>
+    <button type="button" class="ms-btn" data-tab="force"><span class="bn-ico"><svg class="ico" aria-hidden="true"><use href="#i-trend"/></svg></span>Force</button>
+    <button type="button" class="ms-btn" data-tab="profil"><span class="bn-ico"><svg class="ico" aria-hidden="true"><use href="#i-user"/></svg></span>Profil</button>
+  </div>
+
+  <!-- Chronomètre de repos : n'apparaît que pendant un repos en cours -->
+  <div id="rest-timer" class="rest-timer" hidden>
+    <div class="rest-progress" id="rest-progress"></div>
+    <span class="rest-label">Repos</span>
+    <b class="rest-time" id="rest-time" aria-live="off">0:00</b>
+    <button id="rest-stop" class="rest-stop" type="button" aria-label="Arrêter le repos">✕</button>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script src="config.js"></script>
+<script src="demo.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
