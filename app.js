@@ -255,6 +255,7 @@ async function onAuthed(user) {
   renderTemplateSelect();
   renderCircuitBlocks();
   await refreshAll();
+  await preparerSeanceDuJour();
   goToTab(ONGLET_DEMANDE && $(`#view-${ONGLET_DEMANDE}`) ? ONGLET_DEMANDE : "dashboard");
 }
 
@@ -1909,7 +1910,7 @@ async function chargerProgrammeMuscu(p) {
   return true;
 }
 
-function chargerProgrammeCardio(c) {
+function chargerProgrammeCardio(c, { silencieux = false } = {}) {
   if (c.type === "cardio") {
     const sel = $("#cardio-exercice");
     if (![...sel.options].some((o) => o.value === c.exercice_id)) return;
@@ -1917,7 +1918,7 @@ function chargerProgrammeCardio(c) {
     $("#cardio-duree").value = c.duree;
     updateCardioCalc();
     setSeanceType("cardio");
-    showToast(`${libelleCardio(c)} chargé`);
+    if (!silencieux) showToast(`${libelleCardio(c)} chargé`);
   } else if (c.type === "circuit") {
     if (state.circuitExos.length && !confirm("Remplacer le circuit en cours ?")) return;
     state.circuitExos = c.exos
@@ -1928,9 +1929,45 @@ function chargerProgrammeCardio(c) {
     $("#circuit-repos-tour").value = c.repos_tour;
     renderCircuitBlocks();
     setSeanceType("circuit");
-    showToast(`${c.nom} chargé`);
+    if (!silencieux) showToast(`${c.nom} chargé`);
   }
 }
+
+// ---- Séance du jour pré-chargée : le lundi, le formulaire contient déjà la séance du lundi, etc.
+// À l'ouverture de l'app (et au passage d'un jour à l'autre si elle reste ouverte), le formulaire
+// reçoit la séance prévue aujourd'hui, charges de la dernière fois comprises, et se met sur le bon
+// type (muscu, cardio ou circuit). Jamais par-dessus une saisie en cours, ni une fois la séance faite.
+let jourPrepare = null;
+
+async function preparerSeanceDuJour() {
+  jourPrepare = toDateStr();
+  programmeJourVu = null;
+  renderProgrammeJour();
+  const p = programmeDuJour(jourSemaine());
+  // Un brouillon d'un autre jour jamais commencé (aucune série cochée) ne bloque pas la séance du jour.
+  const brouillon = getLS(LS_DRAFT_MUSCU, null);
+  const brouillonDuJour = !!brouillon && toDateStr(new Date(brouillon.savedAt || 0)) === toDateStr();
+  const occupe = () => state.muscuSeries.some((r) => r.done) || (brouillonDuJour && saisieEnCours());
+  if (!p || occupe()) return;
+  const fait = faitLeJour(jourSemaine());
+  if (p.muscu.length && !fait.muscu) {
+    const series = await seriesDepuisProgramme(p);
+    if (!series.length || occupe()) return;
+    state.muscuSeries = series;
+    renderSerieRows();
+    setSeanceType("muscu");
+  } else if (!p.muscu.length && (p.cardio?.type === "cardio" || p.cardio?.type === "circuit") && !fait.cardio && !state.circuitExos.length) {
+    chargerProgrammeCardio(p.cardio, { silencieux: true });
+  }
+}
+
+// L'app laissée ouverte (ou rouverte depuis l'arrière-plan) un autre jour : on recharge et on
+// prépare la séance de ce nouveau jour.
+document.addEventListener("visibilitychange", async () => {
+  if (document.visibilityState !== "visible" || !state.user || !jourPrepare || jourPrepare === toDateStr()) return;
+  await refreshAll();
+  await preparerSeanceDuJour();
+});
 
 $("#programme-load-muscu").addEventListener("click", async () => {
   const p = programmeDuJour(jourVu());
