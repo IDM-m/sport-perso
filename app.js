@@ -1167,15 +1167,22 @@ function caloriesMET(met, poidsKg, dureeMin) {
 // ---------------- SÉANCE : TOGGLE TYPE ----------------
 
 // Le type choisi est mémorisé : on rouvre l'app sur le formulaire qu'on utilise vraiment.
+// L'onglet « Circuit » a laissé sa place à « Programme » : le formulaire circuit ne s'ouvre plus
+// que depuis le programme (bouton « Charger le circuit »), et n'a donc pas d'onglet actif.
 function setSeanceType(type) {
   $$(".toggle-btn").forEach((b) => b.classList.toggle("is-active", b.dataset.type === type));
   $("#form-cardio").hidden = type !== "cardio";
   $("#form-circuit").hidden = type !== "circuit";
+  $("#form-programme").hidden = type !== "programme";
   $("#form-muscu").hidden = type !== "muscu";
+  if (type === "programme") renderProgrammeChoix();
   setLS(LS_SEANCE_TYPE, type);
 }
 $$(".toggle-btn").forEach((btn) => btn.addEventListener("click", () => setSeanceType(btn.dataset.type)));
-setSeanceType(getLS(LS_SEANCE_TYPE, "cardio"));
+{
+  const memorise = getLS(LS_SEANCE_TYPE, "cardio");
+  setSeanceType(memorise === "circuit" ? "muscu" : memorise);
+}
 
 // ---------------- SÉANCE CARDIO ----------------
 
@@ -1810,6 +1817,7 @@ function renderProgrammeSemaine() {
 
 function renderProgrammeJour() {
   renderHeroSeance();
+  if (!$("#form-programme").hidden) renderProgrammeChoix();
   $("#programme-jour").hidden = !state.programme.length;
   if (!state.programme.length) return;
   renderProgrammeSemaine();
@@ -1978,6 +1986,39 @@ $("#programme-load-cardio").addEventListener("click", () => {
   if (!p?.cardio) return;
   chargerProgrammeCardio(p.cardio);
   $("#seance-form-card").scrollIntoView({ block: "start", behavior: "smooth" });
+});
+
+// ---------------- ONGLET « PROGRAMME » ----------------
+// Une carte par séance de muscu du programme (Push A · Force, Pull B…). Un tap charge tous ses
+// exercices et toutes ses séries dans le formulaire muscu, charges de la dernière fois comprises.
+
+function renderProgrammeChoix() {
+  const seances = state.programme.filter((p) => p.muscu.length);
+  if (!seances.length) {
+    $("#programme-choix").innerHTML = `<p class="empty-row">Aucun programme enregistré pour l'instant.</p>`;
+    return;
+  }
+  const nom = (id) => state.exercices.find((x) => x.id === id)?.nom || "?";
+  $("#programme-choix").innerHTML = seances.map((p) => {
+    const lignes = resumeProgrammeMuscu(p.muscu);
+    const aujourdhui = p.jour === jourSemaine();
+    const faite = faitLeJour(p.jour).muscu && p.jour <= jourSemaine();
+    const exos = [...new Set(p.muscu.map((r) => nom(r.exercice_id)))];
+    const apercu = exos.slice(0, 3).join(", ") + (exos.length > 3 ? `, +${exos.length - 3}` : "");
+    const badge = faite ? `<span class="programme-fait">✓ Faite</span>` : aujourdhui ? `<span class="pcs-auj">Aujourd'hui</span>` : "";
+    return `<button type="button" class="pcs${aujourdhui ? " is-today" : ""}" data-jour="${p.jour}">
+      <span class="pcs-head"><b>${p.nom}</b>${p.orientation ? `<span class="programme-tag">${p.orientation}</span>` : ""}${badge}</span>
+      <span class="pcs-meta">${NOMS_JOURS[p.jour].charAt(0).toUpperCase() + NOMS_JOURS[p.jour].slice(1)} · ${lignes.length} exos · ${p.muscu.length} séries · ~${dureeProgrammeMin(p.muscu)} min</span>
+      <span class="pcs-exos">${apercu}</span>
+    </button>`;
+  }).join("");
+}
+
+$("#programme-choix").addEventListener("click", async (e) => {
+  const btn = e.target.closest(".pcs");
+  const p = btn && programmeDuJour(Number(btn.dataset.jour));
+  if (!p) return;
+  if (await chargerProgrammeMuscu(p)) $("#seance-form-card").scrollIntoView({ block: "start", behavior: "smooth" });
 });
 
 // ---------------- MODÈLES DE SÉANCE (muscu) ----------------

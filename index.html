@@ -276,7 +276,7 @@
         <h3 class="card-label">Nouvelle séance</h3>
         <div class="seance-type-toggle">
           <button class="toggle-btn is-active" data-type="cardio">Cardio</button>
-          <button class="toggle-btn" data-type="circuit">Circuit</button>
+          <button class="toggle-btn" data-type="programme">Programme</button>
           <button class="toggle-btn" data-type="muscu">Musculation</button>
         </div>
 
@@ -337,7 +337,13 @@
           <button id="cardio-save" class="btn btn-primary btn-block">Enregistrer la séance</button>
         </div>
 
-        <!-- CIRCUIT FORM -->
+        <!-- PROGRAMME : choisir une séance (Push A, Pull B…), tous ses exercices arrivent dans la muscu -->
+        <div id="form-programme" class="seance-form" hidden>
+          <p class="card-head-sub">Choisis ta séance : tous les exercices et toutes les séries arrivent d'un coup, tu n'as plus qu'à noter tes charges et tes reps.</p>
+          <div id="programme-choix" class="programme-choix"></div>
+        </div>
+
+        <!-- CIRCUIT FORM (ouvert depuis le programme : « Charger le circuit ») -->
         <div id="form-circuit" class="seance-form" hidden>
           <p class="card-head-sub">Enchaîne plusieurs exercices sur plusieurs tours (ex: burpees → pompes → planche).</p>
           <div id="circuit-blocks" class="exo-blocks"></div>
