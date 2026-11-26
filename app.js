@@ -1421,45 +1421,61 @@ function appliquerDernieresPerfs() {
 // ---------------- CHRONO DE REPOS ----------------
 // Démarre au moment où une série est validée (Entrée), ou à la demande via ⏱.
 // Il continue en négatif après zéro, puis s'efface seul si on l'a oublié.
+// Le chrono ne compte pas des « ticks » : il retient l'heure de fin (aussi en localStorage) et
+// recalcule le temps restant à chaque affichage. iOS suspend la PWA dès qu'on la quitte (voire la
+// tue) : au retour, le temps écoulé hors de l'app est donc bien décompté.
+const LS_REST = "sport_rest"; // { fin: timestamp ms, total: s, signale: bool }
 
 let restInterval = null;
 
 function startRest(secondes) {
   const total = Math.max(1, Math.round(Number(secondes) || 0));
-  stopRest(false);
-  let restant = total;
+  setLS(LS_REST, { fin: Date.now() + total * 1000, total, signale: false });
+  afficherRest();
+}
+
+function afficherRest() {
+  const rest = getLS(LS_REST, null);
+  clearInterval(restInterval);
+  restInterval = null;
+  if (!rest?.fin) return;
   const el = $("#rest-timer");
   el.hidden = false;
   document.body.classList.add("rest-on");
 
   const peindre = () => {
-    const abs = Math.abs(restant);
-    const signe = restant < 0 ? "−" : "";
-    $("#rest-time").textContent = `${signe}${Math.floor(abs / 60)}:${String(abs % 60).padStart(2, "0")}`;
-    $("#rest-progress").style.width = `${Math.max(0, (restant / total) * 100)}%`;
-    el.classList.toggle("is-over", restant <= 0);
-  };
-  peindre();
-
-  restInterval = setInterval(() => {
-    restant--;
-    if (restant === 0) {
+    const restant = Math.ceil((rest.fin - Date.now()) / 1000);
+    if (restant <= -90) { stopRest(); return; }
+    if (restant <= 0 && !rest.signale) {
+      rest.signale = true;
+      setLS(LS_REST, rest);
       navigator.vibrate?.([200, 80, 200]);
       showToast("Repos terminé");
     }
-    if (restant <= -90) { stopRest(); return; }
-    peindre();
-  }, 1000);
+    const abs = Math.abs(restant);
+    const signe = restant < 0 ? "−" : "";
+    $("#rest-time").textContent = `${signe}${Math.floor(abs / 60)}:${String(abs % 60).padStart(2, "0")}`;
+    $("#rest-progress").style.width = `${Math.max(0, (restant / rest.total) * 100)}%`;
+    el.classList.toggle("is-over", restant <= 0);
+  };
+  peindre();
+  if (getLS(LS_REST, null)) restInterval = setInterval(peindre, 250); // 250 ms : la seconde change pile à l'heure
 }
 
 function stopRest(masquer = true) {
   clearInterval(restInterval);
   restInterval = null;
   if (masquer) {
+    try { localStorage.removeItem(LS_REST); } catch {}
     $("#rest-timer").hidden = true;
     document.body.classList.remove("rest-on");
   }
 }
+
+// Retour dans l'app (ou relance après qu'iOS l'a fermée) : le chrono reprend là où il en est vraiment.
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") afficherRest(); });
+window.addEventListener("pageshow", afficherRest);
+afficherRest();
 
 $("#rest-stop").addEventListener("click", () => stopRest());
 
